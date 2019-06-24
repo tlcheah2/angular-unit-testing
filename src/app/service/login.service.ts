@@ -1,24 +1,51 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
+export interface UserLoginBody {
+  username: string;
+  password: string;
+}
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
 
-  loggedIn: boolean;
-  constructor() {
-    this.loggedIn = false;
+  baseUrl = environment.apiEndpoint;
+  isLogin = false;
+
+  constructor(
+    private http: HttpClient
+  ) {}
+
+  getIsLogin() {
+    return this.isLogin;
   }
 
-  isLogin() {
-    return this.loggedIn;
-  }
-
-  login() {
-    this.loggedIn = true;
+  login(userloginBody: UserLoginBody): Promise<any> {
+    const path = '/admin/validateUser';
+    return new Promise((resolve, reject) => {
+      this.http.post(this.baseUrl + path, userloginBody)
+        .toPromise()
+        .then((res: BaseResponse) => {
+          if (res.code === '200') {
+            this.isLogin = true;
+            resolve();
+          } else {
+            reject(res);
+          }
+        }).catch((err) => {
+          reject(err.error.message);
+        });
+    });
   }
 
   logout() {
-    this.loggedIn = false;
+    this.isLogin = false;
   }
+}
+
+export interface BaseResponse {
+  code: string;
+  message: string;
 }

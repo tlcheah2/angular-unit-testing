@@ -10,8 +10,10 @@ import { LoginService } from '../service/login.service';
 })
 export class LoginComponent implements OnInit {
 
-  submitted: boolean;
+  submitted = false;
   loginForm: FormGroup;
+  authError = false;
+  authErrorMsg: string;
 
   constructor(
     private router: Router,
@@ -24,9 +26,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.submitted = false;
-  }
+  ngOnInit() {}
 
   get f() {
     return this.loginForm.controls;
@@ -37,9 +37,21 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.invalid) {
       return;
     }
+    const userloginBody = {
+      username: loginData.username,
+      password: loginData.password
+    };
     // Pending API call and logic handling
-    this.loginService.login();
-    this.router.navigate(['/home']);
+    this.loginService.login(userloginBody)
+      .then(() => {
+        // Successfully login
+        this.router.navigate(['/home']);
+      })
+      .catch((reason) => {
+        // Failed login
+        this.authError = true;
+        this.authErrorMsg = reason;
+      });
   }
 
 }

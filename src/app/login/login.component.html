@@ -1,6 +1,6 @@
 <h2>Login</h2>
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)">
-    <p>
+    <div id="username-container">
         <mat-form-field appearance="outline">
             <mat-label>Username</mat-label>
             <input matInput placeholder="Username"
@@ -8,21 +8,26 @@
             [ngClass]="{ 'is-invalid': submitted && f.username.errors }">
             <mat-icon matSuffix>perm_identity</mat-icon>
         </mat-form-field>
-    </p>
+    </div>
 
-    <p>
+    <div id="password-container">
         <mat-form-field appearance="outline">
             <mat-label>Password</mat-label>
             <input matInput placeholder="Password" type="password"
                 formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" >
             <mat-icon matSuffix>vpn_key</mat-icon>
         </mat-form-field>
-    </p>
-
-    <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
-        <div *ngIf="f.username.errors.required" style="color:red">Credential must be provided</div>
     </div>
-    <div class="form-group">
+
+    <div id="username-error-msg" *ngIf="submitted && f.username.errors" class="invalid-feedback">
+        <div id="blank-username-error" *ngIf="f.username.errors.required" style="color:red">Please enter username.</div>
+    </div>
+
+    <div id="password-error-msg" *ngIf="submitted && f.password.errors" class="invalid-feedback">
+        <div id="blank-password-error" *ngIf="f.password.errors.required" style="color:red">Please enter password.</div>
+    </div>
+
+    <div id="login-btn-container" class="form-group">
         <button [disabled]="loading" mat-stroked-button color="primary">Login</button>
     
     </div>
