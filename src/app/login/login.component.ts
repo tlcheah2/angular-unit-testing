@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit {
     this.loginService.login(userloginBody)
       .then(() => {
         // Successfully login
-        this.router.navigate(['/home']);
+        this.router.navigateByUrl('/home');
       })
       .catch((reason) => {
         // Failed login

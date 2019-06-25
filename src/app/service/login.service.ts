@@ -28,12 +28,7 @@ export class LoginService {
       this.http.post(this.baseUrl + path, userloginBody)
         .toPromise()
         .then((res: BaseResponse) => {
-          if (res.code === '200') {
-            this.isLogin = true;
-            resolve();
-          } else {
-            reject(res);
-          }
+          resolve();
         }).catch((err) => {
           reject(err.error.message);
         });
