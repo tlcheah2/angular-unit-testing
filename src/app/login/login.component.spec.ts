@@ -55,34 +55,112 @@ describe('Login Component Isolated Test', () => {
     expect(component.loginForm.invalid).toBeTruthy();
   }));
 });
+
+describe('Login Component Shallow Test', () => {
+
   let fixture: ComponentFixture<LoginComponent>;
+
+  function updateForm(userEmail, userPassword) {
+    fixture.componentInstance.loginForm.controls['username'].setValue(userEmail);
+    fixture.componentInstance.loginForm.controls['password'].setValue(userPassword);
+  }
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        BrowserAnimationsModule,
+      imports: [BrowserAnimationsModule,
         ReactiveFormsModule,
         MatFormFieldModule,
         MatIconModule,
         MatInputModule],
       providers: [
-        LoginService,
+        {provide: LoginService, useValue: loginServiceSpy},
         FormBuilder,
-        {provide: Router, useValue: routerSpy}
+        { provide: Router, useValue: routerSpy }
       ],
-      declarations: [ LoginComponent ]
+      declarations: [LoginComponent],
     }).compileComponents();
+    fixture = TestBed.createComponent(LoginComponent);
   }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(LoginComponent);
-    component = fixture.componentInstance;
+  it('created a form with username and password input and login button', () => {
+    // const fixture = TestBed.createComponent(LoginComponent);
+    const usernameContainer = fixture.debugElement.nativeElement.querySelector('#username-container');
+    const passwordContainer = fixture.debugElement.nativeElement.querySelector('#password-container');
+    const loginBtnContainer = fixture.debugElement.nativeElement.querySelector('#login-btn-container');
+    expect(usernameContainer).toBeDefined();
+    expect(passwordContainer).toBeDefined();
+    expect(loginBtnContainer).toBeDefined();
+  });
+
+  it('Display Username Error Msg when Username is blank', () => {
+    updateForm(blankUser.username, validUser.password);
     fixture.detectChanges();
+
+    const button = fixture.debugElement.nativeElement.querySelector('button');
+    button.click();
+    fixture.detectChanges();
+
+    const usernameErrorMsg = fixture.debugElement.nativeElement.querySelector('#username-error-msg');
+    expect(usernameErrorMsg).toBeDefined();
+    expect(usernameErrorMsg.innerHTML).toContain('Please enter username');
   });
 
-  it('Component successfully created', () => {
-    expect(component).toBeTruthy();
+  it('Display Password Error Msg when Username is blank', () => {
+    updateForm(validUser.username, blankUser.password);
+    fixture.detectChanges();
+
+    const button = fixture.debugElement.nativeElement.querySelector('button');
+    button.click();
+    fixture.detectChanges();
+
+    const passwordErrorMsg = fixture.debugElement.nativeElement.querySelector('#password-error-msg');
+    expect(passwordErrorMsg).toBeDefined();
+    expect(passwordErrorMsg.innerHTML).toContain('Please enter password');
   });
 
+  it('Display Both Username & Password Error Msg when both field is blank', () => {
+    updateForm(blankUser.username, blankUser.password);
+    fixture.detectChanges();
+
+    const button = fixture.debugElement.nativeElement.querySelector('button');
+    button.click();
+    fixture.detectChanges();
+
+    const usernameErrorMsg = fixture.debugElement.nativeElement.querySelector('#username-error-msg');
+    const passwordErrorMsg = fixture.debugElement.nativeElement.querySelector('#password-error-msg');
+
+    expect(usernameErrorMsg).toBeDefined();
+    expect(usernameErrorMsg.innerHTML).toContain('Please enter username');
+
+    expect(passwordErrorMsg).toBeDefined();
+    expect(passwordErrorMsg.innerHTML).toContain('Please enter password');
+  });
+
+  it('When username is blank, username field should display red outline ', () => {
+    updateForm(blankUser.username, validUser.password);
+    fixture.detectChanges();
+    const button = fixture.debugElement.nativeElement.querySelector('button');
+    button.click();
+    fixture.detectChanges();
+
+    const inputs = fixture.debugElement.nativeElement.querySelectorAll('input');
+    const usernameInput = inputs[0];
+
+    expect(usernameInput.classList).toContain('is-invalid');
+  });
+
+  it('When password is blank, password field should display red outline ', () => {
+    updateForm(validUser.username, blankUser.password);
+    fixture.detectChanges();
+    const button = fixture.debugElement.nativeElement.querySelector('button');
+    button.click();
+    fixture.detectChanges();
+
+    const inputs = fixture.debugElement.nativeElement.querySelectorAll('input');
+    const passwordInput = inputs[1];
+
+    expect(passwordInput.classList).toContain('is-invalid');
+  });
+});
 
 });
