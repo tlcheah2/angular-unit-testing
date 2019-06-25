@@ -163,4 +163,66 @@ describe('Login Component Shallow Test', () => {
   });
 });
 
+describe('Login Component Integrated Test', () => {
+  let fixture: ComponentFixture<LoginComponent>;
+  let loginSpy;
+  function updateForm(userEmail, userPassword) {
+    fixture.componentInstance.loginForm.controls['username'].setValue(userEmail);
+    fixture.componentInstance.loginForm.controls['password'].setValue(userPassword);
+  }
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule,
+        BrowserAnimationsModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule
+      ],
+      providers: [
+        {provide: LoginService, useValue: loginServiceSpy},
+        FormBuilder,
+        { provide: Router, useValue: routerSpy }
+      ],
+      declarations: [LoginComponent],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(LoginComponent);
+    // router = TestBed.get(Router);
+
+    loginSpy = loginServiceSpy.login.and.returnValue(Promise.resolve(testUserData));
+
+  }));
+
+  it('loginService login() should called ', fakeAsync(() => {
+    updateForm(validUser.username, validUser.password);
+    fixture.detectChanges();
+    const button = fixture.debugElement.nativeElement.querySelector('button');
+    button.click();
+    fixture.detectChanges();
+
+    expect(loginServiceSpy.login).toHaveBeenCalled();
+  }));
+
+  it('should route to home if login successfully', fakeAsync(() => {
+    updateForm(validUser.username, validUser.password);
+    fixture.detectChanges();
+    const button = fixture.debugElement.nativeElement.querySelector('button');
+    button.click();
+    advance(fixture);
+
+    loginSpy = loginServiceSpy.login.and.returnValue(Promise.resolve(testUserData));
+    advance(fixture);
+
+    expect(routerSpy.navigateByUrl).toHaveBeenCalled();
+    const navArgs = routerSpy.navigateByUrl.calls.first().args[0];
+    // expecting to navigate to id of the component's first hero
+    expect(navArgs).toBe('/home', 'should nav to Home Page');
+  }));
+  function advance(f: ComponentFixture<any>) {
+    tick();
+    f.detectChanges();
+  }
 });
